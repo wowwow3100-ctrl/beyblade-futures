@@ -95,6 +95,30 @@ function Sparkline({ history }) {
   );
 }
 
+function BladeIcon({ blade, size = 26 }) {
+  const [failed, setFailed] = useState(false);
+  // 優先使用 blade.img（外部URL），其次用本地 /blades/CODE.png，最後 fallback 到 emoji
+  const src = blade.img || `/blades/${blade.code}.png`;
+  if (failed || !src) {
+    return <span style={{fontSize: size, lineHeight: 1, filter:"drop-shadow(0 0 6px rgba(255,150,0,.5))"}}>{blade.emoji}</span>;
+  }
+  return (
+    <img
+      src={src}
+      alt={blade.name}
+      onError={() => setFailed(true)}
+      loading="lazy"
+      style={{
+        width: size,
+        height: size,
+        objectFit: "contain",
+        flexShrink: 0,
+        filter: "drop-shadow(0 0 4px rgba(255,150,0,.4))"
+      }}
+    />
+  );
+}
+
 function MonthlyTable({ blade }) {
   return (
     <div className="mt-wrap">
@@ -222,7 +246,7 @@ export default function App() {
             <div className="wb-title">
               <span className="wb-fire">🔥</span>
               <span>本週漲幅榜</span>
-              <span className="wb-sub">本周報價</span>
+              <span className="wb-sub">3月→4月</span>
             </div>
             <div className="wb-list">
               {weeklyTop.map((b,i)=>(
@@ -235,7 +259,7 @@ export default function App() {
                   }, 50);
                 }}>
                   <span className={`wb-rank wb-rank-${i+1}`}>#{i+1}</span>
-                  <span className="wb-em">{b.emoji}</span>
+                  <span className="wb-em"><BladeIcon blade={b} size={20}/></span>
                   <div className="wb-info">
                     <div className="wb-name">{b.code} {b.name}</div>
                     <div className="wb-price">NT${curPx(b).toLocaleString()}</div>
@@ -267,7 +291,7 @@ export default function App() {
                   }, 50);
                 }}>
                   <span className={`wb-rank wb-rank-${i+1}`}>#{i+1}</span>
-                  <span className="wb-em">{b.emoji}</span>
+                  <span className="wb-em"><BladeIcon blade={b} size={20}/></span>
                   <div className="wb-info">
                     <div className="wb-name">{b.code} {b.name}</div>
                     <div className="wb-price">NT${b.history[0].toLocaleString()} → NT${curPx(b).toLocaleString()}</div>
@@ -297,7 +321,7 @@ export default function App() {
                     const on = tracked.has(b.id);
                     return (
                       <div key={b.id} className="sitem">
-                        <span className="sitem-em">{b.emoji}</span>
+                        <span className="sitem-em"><BladeIcon blade={b} size={22}/></span>
                         <div className="sitem-info">
                           <div className="sitem-name">{b.code} {b.name}</div>
                           <div className="sitem-sub">NT${curPx(b).toLocaleString()} · <span className="green">+{totPct(b)}%</span></div>
@@ -324,7 +348,7 @@ export default function App() {
                     <span className="card-rank">#{i+1}</span>
                     <div className="card-top">
                       <div className="card-left">
-                        <span className="card-em">{b.emoji}</span>
+                        <span className="card-em"><BladeIcon blade={b} size={32}/></span>
                         <div>
                           <div className="card-name">{b.code} {b.name}</div>
                           <div className="card-full">{b.fullName}</div>
@@ -387,7 +411,7 @@ export default function App() {
             return (
               <div key={s.id} className={`stock-card${s.inStock?" stock-card--in":""}`}>
                 <div className="stock-top">
-                  <span className="stock-em">{blade.emoji}</span>
+                  <span className="stock-em"><BladeIcon blade={blade} size={26}/></span>
                   <div className="stock-info">
                     <div className="stock-name">{blade.code} {blade.name}</div>
                     <div className="stock-full">{blade.fullName}</div>
@@ -468,7 +492,7 @@ export default function App() {
                   return (
                     <div key={b.id} className={`litem${on?" litem--on":""}`} onClick={()=>toggle(b.id)}>
                       <div className={`lcheck${on?" lcheck--on":""}`}>{on?"✓":""}</div>
-                      <span className="lem">{b.emoji}</span>
+                      <span className="lem"><BladeIcon blade={b} size={24}/></span>
                       <div className="linfo">
                         <div className="lname">{b.code} {b.name}</div>
                         <div className="lfull">{b.fullName} · {b.type}型</div>
