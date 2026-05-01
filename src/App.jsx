@@ -173,6 +173,12 @@ export default function App() {
     .sort((a, b) => b.week - a.week)
     .slice(0, 5);
 
+  // 半年漲幅排行（前5名，高到低）
+  const halfYearTop = [...ALL_BLADES]
+    .map(b => ({ ...b, half: parseFloat(totPct(b)) }))
+    .sort((a, b) => b.half - a.half)
+    .slice(0, 5);
+
   // 清單頁過濾
   const filteredList = listFilter === "ALL"
     ? ALL_BLADES
@@ -237,6 +243,38 @@ export default function App() {
                   <div className="wb-pct">
                     <div className="wb-num">+{b.week.toFixed(1)}%</div>
                     <div className="wb-lbl">本週</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 半年漲幅榜 */}
+          <div className="weekly-board hy-board">
+            <div className="wb-title">
+              <span className="wb-fire">📈</span>
+              <span>半年來漲幅王</span>
+              <span className="wb-sub">2025.11 → 2026.04</span>
+            </div>
+            <div className="wb-list">
+              {halfYearTop.map((b,i)=>(
+                <div key={b.id} className="wb-item" onClick={()=>{
+                  if (!tracked.has(b.id)) toggle(b.id);
+                  setTab("price");
+                  setTimeout(() => {
+                    const idx = ALL_BLADES.filter(x=>tracked.has(x.id) || x.id===b.id).findIndex(x=>x.id===b.id);
+                    setSelected(idx);
+                  }, 50);
+                }}>
+                  <span className={`wb-rank wb-rank-${i+1}`}>#{i+1}</span>
+                  <span className="wb-em">{b.emoji}</span>
+                  <div className="wb-info">
+                    <div className="wb-name">{b.code} {b.name}</div>
+                    <div className="wb-price">NT${b.history[0].toLocaleString()} → NT${curPx(b).toLocaleString()}</div>
+                  </div>
+                  <div className="wb-pct">
+                    <div className="wb-num">+{b.half.toFixed(1)}%</div>
+                    <div className="wb-lbl">半年</div>
                   </div>
                 </div>
               ))}
