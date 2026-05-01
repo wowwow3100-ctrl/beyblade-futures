@@ -222,7 +222,7 @@ export default function App() {
             <div className="wb-title">
               <span className="wb-fire">🔥</span>
               <span>本週漲幅榜</span>
-              <span className="wb-sub">3月→4月</span>
+              <span className="wb-sub">本周報價</span>
             </div>
             <div className="wb-list">
               {weeklyTop.map((b,i)=>(
