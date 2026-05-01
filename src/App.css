@@ -386,3 +386,118 @@ body{
 .sl-price{color:#fff;font-weight:700;flex-shrink:0;margin-left:8px}
 .stock-min{font-size:12px;color:var(--muted)}
 .stock-min strong{color:var(--fire2)}
+
+/* ── Weekly Board ── */
+.weekly-board{
+  background:linear-gradient(135deg,rgba(255,68,0,.12),rgba(255,0,80,.06));
+  border:1px solid rgba(255,68,0,.4);
+  border-radius:8px;padding:14px 14px 12px;
+  margin-bottom:8px;
+  box-shadow:0 0 24px rgba(255,68,0,.12);
+  position:relative;overflow:hidden;
+}
+.weekly-board::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 80% 50% at 50% 0%,rgba(255,170,0,.1),transparent 70%);
+  pointer-events:none;
+}
+.wb-title{
+  display:flex;align-items:center;gap:8px;
+  font-family:'Bangers',cursive;letter-spacing:1px;
+  font-size:18px;color:var(--fire2);
+  margin-bottom:10px;
+  text-shadow:0 0 12px rgba(255,170,0,.5);
+}
+.wb-fire{font-size:20px;animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+.wb-sub{font-size:11px;color:var(--muted);font-family:'Noto Sans TC',sans-serif;letter-spacing:0;margin-left:auto}
+.wb-list{display:flex;flex-direction:column;gap:5px}
+.wb-item{
+  display:flex;align-items:center;gap:8px;
+  background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.06);
+  border-radius:5px;padding:8px 10px;
+  cursor:pointer;transition:all .15s;
+  -webkit-tap-highlight-color:transparent;
+}
+.wb-item:hover{background:rgba(255,68,0,.1);border-color:rgba(255,68,0,.3)}
+.wb-rank{
+  font-family:'Bangers',cursive;font-size:14px;
+  color:var(--muted);min-width:24px;
+}
+.wb-rank-1{color:#ffd700;text-shadow:0 0 8px rgba(255,215,0,.6)}
+.wb-rank-2{color:#c0c0c0}
+.wb-rank-3{color:#cd7f32}
+.wb-em{font-size:18px;flex-shrink:0}
+.wb-info{flex:1;min-width:0}
+.wb-name{font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wb-price{font-size:10px;color:var(--muted);margin-top:1px}
+.wb-pct{text-align:right;flex-shrink:0}
+.wb-num{font-size:14px;font-weight:900;color:var(--green);font-family:'Bangers',cursive;letter-spacing:.5px}
+.wb-lbl{font-size:8px;color:var(--muted);letter-spacing:1px}
+
+/* ── List actions (全選/全不選) ── */
+.list-actions{
+  display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+  padding:4px 0 8px;
+}
+.action-btn{
+  padding:7px 14px;border-radius:4px;font-size:12px;font-weight:700;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.12);
+  color:var(--muted);cursor:pointer;
+  font-family:'Noto Sans TC',sans-serif;
+  transition:all .15s;
+  -webkit-tap-highlight-color:transparent;
+}
+.action-btn:hover{background:rgba(255,255,255,.08);color:var(--text)}
+.action-btn--add{
+  background:rgba(255,68,0,.15);
+  border-color:rgba(255,68,0,.4);
+  color:var(--fire2);
+}
+.action-btn--add:hover{background:rgba(255,68,0,.25);color:#fff}
+.action-info{
+  font-size:11px;color:var(--muted);
+  margin-left:auto;
+}
+
+/* ── List filter ── */
+.list-filter{
+  display:flex;gap:4px;flex-wrap:wrap;
+  padding-bottom:8px;
+  overflow-x:auto;-webkit-overflow-scrolling:touch;
+}
+.filter-btn{
+  padding:6px 12px;border-radius:3px;font-size:11px;font-weight:700;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.08);
+  color:var(--muted);cursor:pointer;
+  font-family:'Noto Sans TC',sans-serif;
+  white-space:nowrap;flex-shrink:0;
+  transition:all .15s;
+  -webkit-tap-highlight-color:transparent;
+}
+.filter-btn--on{
+  background:rgba(255,68,0,.18);
+  border-color:rgba(255,68,0,.5);
+  color:var(--fire2);
+}
+
+/* ── Series group with toggle ── */
+.series-label-row{
+  display:flex;align-items:center;gap:8px;
+  margin-bottom:6px;padding-bottom:4px;
+  border-bottom:1px solid rgba(255,68,0,.15);
+}
+.series-label-row .series-label{
+  flex:1;border:none;padding:0;margin:0;
+}
+.series-toggle{
+  font-size:10px;font-weight:700;
+  background:rgba(255,68,0,.1);
+  border:1px solid rgba(255,68,0,.3);
+  color:var(--fire2);
+  padding:3px 8px;border-radius:3px;cursor:pointer;
+  font-family:'Noto Sans TC',sans-serif;
+  -webkit-tap-highlight-color:transparent;
+}
