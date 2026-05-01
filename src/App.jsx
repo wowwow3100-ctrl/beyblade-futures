@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./App.css";
 
 const ALL_BLADES = [
@@ -72,6 +72,26 @@ export default function App() {
   const [selected,setSelected] = useState(null);
   const [unit,    setUnit]     = useState(1);
   const [tab,     setTab]      = useState("price");
+  const [stock,   setStock]    = useState([]);
+  const [stockLoading, setStockLoading] = useState(false);
+  const [stockUpdated, setStockUpdated] = useState(null);
+
+  useEffect(() => {
+    if (tab === "stock" && stock.length === 0) fetchStock();
+  }, [tab]);
+
+  const fetchStock = async () => {
+    setStockLoading(true);
+    try {
+      const res = await fetch("/api/stock");
+      const data = await res.json();
+      if (data.ok) {
+        setStock(data.results);
+        setStockUpdated(new Date().toLocaleTimeString("zh-TW"));
+      }
+    } catch(e) { console.error(e); }
+    finally { setStockLoading(false); }
+  };
 
   const toggle = id => setTracked(prev => {
     const n = new Set(prev);
@@ -79,8 +99,8 @@ export default function App() {
     return n;
   });
 
-  const trackedBlades  = ALL_BLADES.filter(b => tracked.has(b.id));
-  const searchResults  = search.trim()
+  const trackedBlades = ALL_BLADES.filter(b => tracked.has(b.id));
+  const searchResults = search.trim()
     ? ALL_BLADES.filter(b =>
         b.name.includes(search) ||
         b.code.toLowerCase().includes(search.toLowerCase()) ||
@@ -97,7 +117,6 @@ export default function App() {
         }}/>
       ))}
 
-      {/* HEADER */}
       <header className="header">
         <div className="badge">BEYBLADE X · TAIWAN MARKET</div>
         <h1 className="title">
@@ -110,22 +129,16 @@ export default function App() {
         </div>
       </header>
 
-      {/* TABS */}
       <nav className="tabs">
-        <button className={`tab${tab==="price"?" tab--on":""}`} onClick={()=>{setTab("price");setSelected(null);}}>
-          📈 報價趨勢
-        </button>
-        <button className={`tab${tab==="list"?" tab--on":""}`} onClick={()=>{setTab("list");setSelected(null);}}>
-          📋 陀螺清單
-        </button>
+        <button className={`tab${tab==="price"?" tab--on":""}`} onClick={()=>{setTab("price");setSelected(null);}}>📈 報價趨勢</button>
+        <button className={`tab${tab==="stock"?" tab--on":""}`} onClick={()=>setTab("stock")}>🏪 補貨情報</button>
+        <button className={`tab${tab==="list"?" tab--on":""}`} onClick={()=>{setTab("list");setSelected(null);}}>📋 陀螺清單</button>
       </nav>
 
       <main className="main">
 
         {/* ── PRICE TAB ── */}
         {tab==="price" && (<>
-
-          {/* Search bar */}
           <div className="sbar">
             <span>🔍</span>
             <input className="sinput" placeholder="搜尋型號或名稱…"
@@ -133,7 +146,6 @@ export default function App() {
             {search && <button className="sclear" onClick={()=>setSearch("")}>✕</button>}
           </div>
 
-          {/* Search results */}
           {search && (
             <div className="sresults">
               {searchResults.length===0
@@ -157,18 +169,15 @@ export default function App() {
             </div>
           )}
 
-          {/* Price cards */}
           {trackedBlades.length===0
             ? <div className="empty">去「陀螺清單」加入想追蹤的款式</div>
             : trackedBlades.map((b,i)=>{
-                const g     = gain(b);
+                const g      = gain(b);
                 const isOpen = selected===i;
                 return (
                   <div key={b.id} className={`card${isOpen?" card--open":""}`}
                     onClick={()=>setSelected(isOpen?null:i)}>
-
                     <span className="card-rank">#{i+1}</span>
-
                     <div className="card-top">
                       <div className="card-left">
                         <span className="card-em">{b.emoji}</span>
@@ -190,7 +199,6 @@ export default function App() {
                         </div>
                       </div>
                     </div>
-
                     {isOpen && (
                       <div className="detail">
                         <MonthlyTable blade={b}/>
@@ -221,6 +229,61 @@ export default function App() {
                 );
               })
           }
+        </>)}
+
+        {/* ── STOCK TAB ── */}
+        {tab==="stock" && (<>
+          <div className="stock-hdr">
+            <div className="list-title">🏪 蝦皮補貨情報</div>
+            <div className="list-sub">即時抓取蝦皮現貨資訊</div>
+            <button className="rbtn" onClick={fetchStock} disabled={stockLoading}>
+              {stockLoading ? "⏳ 查詢中…" : "🔄 重新查詢"}
+            </button>
+            {stockUpdated && <div className="stock-updated">更新：{stockUpdated}</div>}
+          </div>
+
+          {stockLoading && (
+            <div className="stock-loading">
+              <div className="spin-big">⚙</div>
+              <div>正在查詢蝦皮現貨…</div>
+            </div>
+          )}
+
+          {!stockLoading && stock.length === 0 && (
+            <div className="empty">點上方「重新查詢」載入補貨情報</div>
+          )}
+
+          {!stockLoading && stock.map(s=>{
+            const blade = ALL_BLADES.find(b=>b.id===s.id);
+            if (!blade) return null;
+            return (
+              <div key={s.id} className={`stock-card${s.inStock?" stock-card--in":""}`}>
+                <div className="stock-top">
+                  <span className="stock-em">{blade.emoji}</span>
+                  <div className="stock-info">
+                    <div className="stock-name">{blade.code} {blade.name}</div>
+                    <div className="stock-full">{blade.fullName}</div>
+                  </div>
+                  <div className={`stock-badge${s.inStock?" stock-badge--in":""}`}>
+                    {s.inStock ? "✅ 有貨" : "❌ 缺貨"}
+                  </div>
+                </div>
+                {s.listings && s.listings.length > 0 && (
+                  <div className="stock-listings">
+                    {s.listings.map((l,i)=>(
+                      <div key={i} className="stock-listing">
+                        <div className="sl-name">{l.name}…</div>
+                        <div className="sl-price">NT${l.price.toLocaleString()}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {s.minPrice && (
+                  <div className="stock-min">蝦皮最低：<strong>NT${s.minPrice.toLocaleString()}</strong></div>
+                )}
+              </div>
+            );
+          })}
         </>)}
 
         {/* ── LIST TAB ── */}
