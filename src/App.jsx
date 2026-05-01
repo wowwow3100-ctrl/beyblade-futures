@@ -172,6 +172,7 @@ export default function App() {
             ? <div className="empty">去「陀螺清單」加入想追蹤的款式</div>
             : trackedBlades.map((b,i)=>{
                 const isOpen = selected===i;
+                const g = gain(b);
                 return (
                   <div key={b.id} className={`card${isOpen?" card--open":""}`}
                     onClick={()=>setSelected(isOpen?null:i)}>
