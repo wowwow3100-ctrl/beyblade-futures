@@ -95,10 +95,33 @@ function Sparkline({ history }) {
   );
 }
 
+// 圖片 URL 快取（在記憶體中，避免重複呼叫 API）
+const imgCache = new Map();
+
 function BladeIcon({ blade, size = 26 }) {
+  const [src, setSrc] = useState(blade.img || imgCache.get(blade.code) || null);
   const [failed, setFailed] = useState(false);
-  // 優先使用 blade.img（外部URL），其次用本地 /blades/CODE.png，最後 fallback 到 emoji
-  const src = blade.img || `/blades/${blade.code}.png`;
+
+  useEffect(() => {
+    // 已有手動設定的 img 或快取，跳過自動搜尋
+    if (blade.img || imgCache.has(blade.code)) return;
+    if (failed) return;
+
+    // 自動從 /api/img 抓圖
+    const query = `Beyblade X ${blade.code} ${blade.fullName}`;
+    fetch(`/api/img?q=${encodeURIComponent(query)}`)
+      .then(r => r.json())
+      .then(d => {
+        if (d.ok && d.image) {
+          imgCache.set(blade.code, d.image);
+          setSrc(d.image);
+        } else {
+          setFailed(true);
+        }
+      })
+      .catch(() => setFailed(true));
+  }, [blade.code]);
+
   if (failed || !src) {
     return <span style={{fontSize: size, lineHeight: 1, filter:"drop-shadow(0 0 6px rgba(255,150,0,.5))"}}>{blade.emoji}</span>;
   }
@@ -112,6 +135,7 @@ function BladeIcon({ blade, size = 26 }) {
         width: size,
         height: size,
         objectFit: "contain",
+        borderRadius: 4,
         flexShrink: 0,
         filter: "drop-shadow(0 0 4px rgba(255,150,0,.4))"
       }}
