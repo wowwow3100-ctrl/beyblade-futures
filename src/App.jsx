@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import "./App.css";
 
 const ALL_BLADES = [
-  { id:1,  series:"UX", code:"UX-15", name:"鯊魚組",      fullName:"Shark Scale 4-50UF",   type:"攻擊", emoji:"🦈", officialPrice:700,  history:[1200,1400,1700,2000,2200,2500] },
-  { id:2,  series:"UX", code:"UX-03", name:"神杖",         fullName:"Wizard Arrow 4-80B",    type:"耐久", emoji:"🪄", officialPrice:550,  history:[900,950,1050,1200,1400,1600] },
-  { id:3,  series:"BX", code:"BX-23", name:"鳳凰",         fullName:"Phoenix Wing 4-70GF",   type:"平衡", emoji:"🦅", officialPrice:495,  history:[600,650,700,850,950,1100] },
+  { id:1,  series:"UX", code:"UX-15", name:"鯊魚組",      fullName:"Shark Scale 4-50UF",   type:"攻擊", emoji:"🦈", officialPrice:700,  history:[1800,1900,2000,2200,2400,2500] },
+  { id:2,  series:"UX", code:"UX-03", name:"神杖",         fullName:"Wizard Arrow 4-80B",    type:"耐久", emoji:"🪄", officialPrice:550,  history:[1100,1150,1200,1350,1500,1600] },
+  { id:3,  series:"BX", code:"BX-23", name:"鳳凰",         fullName:"Phoenix Wing 4-70GF",   type:"平衡", emoji:"🦅", officialPrice:495,  history:[700,750,800,900,1000,1100] },
   { id:4,  series:"BX", code:"BX-00", name:"25週年紀念組", fullName:"25th Anniversary Set",  type:"限定", emoji:"🏆", officialPrice:2800, history:[2800,3000,3500,4200,4800,5500] },
   { id:5,  series:"BX", code:"BXG-17",name:"黑金限定軸心", fullName:"黑金版 APP限定",         type:"限定", emoji:"⚡", officialPrice:460,  history:[460,600,900,1200,1500,1800] },
   { id:6,  series:"UX", code:"UX-01", name:"獅子組",       fullName:"Leon Claw 4-55P",       type:"攻擊", emoji:"🦁", officialPrice:550,  history:[550,580,620,700,820,980] },
@@ -17,7 +17,7 @@ const ALL_BLADES = [
 ];
 
 const MONTHS  = ["11月","12月","1月","2月","3月","4月"];
-const UPDATED = "2026年4月30日";
+const UPDATED = "2026年5月1日";
 
 const pct    = (a,b) => (((b-a)/a)*100).toFixed(1);
 const gain   = b => b.history[b.history.length-1] - b.history[0];
@@ -70,7 +70,6 @@ export default function App() {
   const [tracked, setTracked]  = useState(new Set([1,2,3,4,5]));
   const [search,  setSearch]   = useState("");
   const [selected,setSelected] = useState(null);
-  const [unit,    setUnit]     = useState(1);
   const [tab,     setTab]      = useState("price");
   const [stock,   setStock]    = useState([]);
   const [stockLoading, setStockLoading] = useState(false);
@@ -172,7 +171,6 @@ export default function App() {
           {trackedBlades.length===0
             ? <div className="empty">去「陀螺清單」加入想追蹤的款式</div>
             : trackedBlades.map((b,i)=>{
-                const g      = gain(b);
                 const isOpen = selected===i;
                 return (
                   <div key={b.id} className={`card${isOpen?" card--open":""}`}
@@ -207,22 +205,7 @@ export default function App() {
                           <div className="stat"><span>現在溢價</span><b className="orange">+NT${(curPx(b)-b.officialPrice).toLocaleString()}</b></div>
                           <div className="stat"><span>半年漲幅</span><b className="green">NT${g.toLocaleString()}</b></div>
                         </div>
-                        <div className="calc">
-                          <div className="calc-title">💰 獲利試算</div>
-                          <div className="calc-row">
-                            <span>持有：</span>
-                            {[1,3,5,10].map(n=>(
-                              <button key={n} className={`ubtn${unit===n?" ubtn--on":""}`}
-                                onClick={e=>{e.stopPropagation();setUnit(n);}}>
-                                {n}顆
-                              </button>
-                            ))}
-                          </div>
-                          <div className="calc-result">
-                            半年獲利：NT${(g*unit).toLocaleString()}
-                            <span className="calc-sub">（{unit}顆）</span>
-                          </div>
-                        </div>
+
                       </div>
                     )}
                   </div>
